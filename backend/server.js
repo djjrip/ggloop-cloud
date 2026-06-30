@@ -42,8 +42,39 @@ app.post('/api/leads', (req, res) => {
 });
 
 // Stripe Checkout Endpoint
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripeKey = process.env.STRIPE_SECRET_KEY;
+const stripe = stripeKey ? require('stripe')(stripeKey) : null;
 
 app.post('/api/checkout', async (req, res) => {
   try {
     const { priceId, successUrl, cancelUrl } = req.body;
+    
+    if (!stripe) {
+      return res.status(500).json({ error: 'Stripe is not configured on the server yet. Check your .env file.' });
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+    });
+
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error('❌ Stripe Error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`🚀 GG Loop Lead Broker running on http://localhost:${PORT}`);
+  console.log(`   WebSockets ready. Waiting for dashboard connections...`);
+});

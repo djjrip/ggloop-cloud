@@ -1,61 +1,66 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import AmbientBackground from './components/AmbientBackground';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
-import KpiStrip from './components/KpiStrip';
-import LiveFeed from './components/LiveFeed';
-import ConversionStats from './components/ConversionStats';
-import PluginStore from './components/PluginStore';
+import PaywallGate from './components/PaywallGate';
+import Overview from './pages/Overview';
+import AntiCheat from './pages/AntiCheat';
+import Intel from './pages/Intel';
+import Plugins from './pages/Plugins';
+import Settings from './pages/Settings';
 import { useLeads } from './hooks/useLeads';
 
-const fade = {
-  initial: { opacity: 0, y: 16 },
+const pageFade = {
+  initial: { opacity: 0, y: 14 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -12 },
-  transition: { duration: 0.35 },
+  exit: { opacity: 0, y: -10 },
+  transition: { duration: 0.3 },
 };
 
 export default function App() {
-  const { leads, status, paused, setPaused, totalSeen, highValue } = useLeads();
-  const [tab, setTab] = useState('overview');
+  const leadsApi = useLeads();
+  const location = useLocation();
 
   return (
-    <div className="flex min-h-screen">
-      <AmbientBackground />
-      <Sidebar active={tab} onSelect={setTab} status={status} />
+    <PaywallGate>
+      <div className="flex min-h-screen">
+        <AmbientBackground />
+        <Sidebar status={leadsApi.status} />
 
-      <main className="flex min-w-0 flex-1 flex-col gap-[22px] p-4 md:p-[22px_28px_40px]">
-        <Topbar status={status} paused={paused} onTogglePause={() => setPaused((p) => !p)} />
-        <KpiStrip totalSeen={totalSeen} highValue={highValue} />
+        <main className="flex min-w-0 flex-1 flex-col gap-[22px] p-4 md:p-[22px_28px_40px]">
+          <Topbar
+            status={leadsApi.status}
+            paused={leadsApi.paused}
+            onTogglePause={() => leadsApi.setPaused((p) => !p)}
+          />
 
-        <AnimatePresence mode="wait">
-          {tab === 'store' ? (
-            <motion.div key="store" {...fade}>
-              <PluginStore />
+          <AnimatePresence mode="wait">
+            <motion.div key={location.pathname} {...pageFade} className="flex flex-1 flex-col gap-[22px]">
+              <Routes location={location}>
+                <Route path="/" element={<Overview leadsApi={leadsApi} />} />
+                <Route path="/anti-cheat" element={<AntiCheat leadsApi={leadsApi} />} />
+                <Route path="/intel" element={<Intel leadsApi={leadsApi} />} />
+                <Route path="/plugins" element={<Plugins />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/success" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
             </motion.div>
-          ) : (
-            <motion.div key="overview" {...fade} className="flex flex-col gap-[22px]">
-              <section className="grid grid-cols-1 gap-[22px] lg:grid-cols-[1.05fr_0.95fr]">
-                <LiveFeed leads={leads} status={status} />
-                <ConversionStats totalSeen={totalSeen} highValue={highValue} />
-              </section>
-              <PluginStore />
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </AnimatePresence>
 
-        <footer className="flex justify-between px-1 py-1.5 text-xs text-zinc-600">
-          <span>© 2026 GG Loop — Hermes V2 Lead Engine</span>
-          <span>
-            {status === 'live'
-              ? 'Live · localhost:3000'
-              : status === 'mock'
-              ? 'Demo stream · backend offline'
-              : 'Connecting…'}
-          </span>
-        </footer>
-      </main>
-    </div>
+          <footer className="flex justify-between px-1 py-1.5 text-xs text-zinc-600">
+            <span>© 2026 GG Loop — Hermes V2 Lead Engine</span>
+            <span>
+              {leadsApi.status === 'live'
+                ? 'Live · localhost:3000'
+                : leadsApi.status === 'offline'
+                ? 'Broker offline · localhost:3000'
+                : 'Connecting…'}
+            </span>
+          </footer>
+        </main>
+      </div>
+    </PaywallGate>
   );
 }
