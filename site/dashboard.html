@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hermes Lead Dashboard — real-time B2B SaaS lead intelligence for GG Loop Cloud.">
+    <title>Hermes — Lead Dashboard · GG Loop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <!-- Ambient background -->
+    <div class="ambient">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="ambient-grid"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar glass">
+        <a href="#" class="brand">
+            <span class="brand-mark">∞</span>
+            <span class="brand-text">GG Loop</span>
+        </a>
+        <nav class="side-nav">
+            <a href="#" class="side-link active"><span class="ico">◎</span> Overview</a>
+            <a href="#live" class="side-link"><span class="ico">⚡</span> Live Feed</a>
+            <a href="#stats" class="side-link"><span class="ico">▤</span> Conversions</a>
+            <a href="#store" class="side-link"><span class="ico">◳</span> Plugin Store</a>
+            <a href="#" class="side-link"><span class="ico">⚙</span> Settings</a>
+        </nav>
+        <div class="side-foot glass-soft">
+            <div class="hermes-badge">
+                <span class="hermes-dot"></span>
+                Hermes V2
+            </div>
+            <p>Lambda sniper online</p>
+            <span class="region">us-east-1 · λ</span>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+        <!-- Topbar -->
+        <header class="topbar glass">
+            <div>
+                <h1 class="page-title">Hermes Lead Dashboard</h1>
+                <p class="page-sub">Sniping high-value B2B SaaS leads across Reddit &amp; Twitter</p>
+            </div>
+            <div class="topbar-right">
+                <div class="status-pill">
+                    <span class="status-dot"></span>
+                    <span id="feedStatus">Live</span>
+                </div>
+                <button class="ghost-btn" id="pauseBtn">Pause</button>
+                <div class="avatar">JQ</div>
+            </div>
+        </header>
+
+        <!-- KPI strip -->
+        <section class="kpi-strip">
+            <div class="kpi glass">
+                <span class="kpi-label">Leads Today</span>
+                <span class="kpi-value" data-count="247">0</span>
+                <span class="kpi-trend up">▲ 18% vs yesterday</span>
+            </div>
+            <div class="kpi glass">
+                <span class="kpi-label">High-Value (≥$5k MRR)</span>
+                <span class="kpi-value" data-count="38">0</span>
+                <span class="kpi-trend up">▲ 6 new this hour</span>
+            </div>
+            <div class="kpi glass">
+                <span class="kpi-label">Converted → Cloud</span>
+                <span class="kpi-value" data-count="61">0</span>
+                <span class="kpi-trend up">▲ 9 this week</span>
+            </div>
+            <div class="kpi glass">
+                <span class="kpi-label">MRR Captured</span>
+                <span class="kpi-value" data-count="1769" data-prefix="$">0</span>
+                <span class="kpi-trend neutral">61 × $29/mo</span>
+            </div>
+        </section>
+
+        <!-- Grid: Live feed + Conversion stats -->
+        <section class="grid-two">
+            <!-- LIVE FEED -->
+            <div class="panel glass" id="live">
+                <div class="panel-head">
+                    <div>
+                        <h2 class="panel-title">Live Feed</h2>
+                        <p class="panel-sub">Incoming leads as Hermes detects them</p>
+                    </div>
+                    <span class="live-tag"><span class="live-blink"></span> streaming</span>
+                </div>
+                <div class="feed" id="feed"><!-- injected --></div>
+            </div>
+
+            <!-- CONVERSION STATS -->
+            <div class="panel glass" id="stats">
+                <div class="panel-head">
+                    <div>
+                        <h2 class="panel-title">Conversion Stats</h2>
+                        <p class="panel-sub">Leads converted to GG Loop Cloud · $29/mo</p>
+                    </div>
+                    <span class="rate-chip" id="rateChip">24.7% rate</span>
+                </div>
+
+                <div class="conv-hero">
+                    <div class="ring" id="ring">
+                        <svg viewBox="0 0 120 120">
+                            <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+                            <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"></circle>
+                        </svg>
+                        <div class="ring-center">
+                            <span class="ring-pct" id="ringPct">0%</span>
+                            <span class="ring-label">conv. rate</span>
+                        </div>
+                    </div>
+                    <div class="conv-side">
+                        <div class="conv-row">
+                            <span class="conv-k">Sniped</span>
+                            <span class="conv-v">247</span>
+                        </div>
+                        <div class="conv-row">
+                            <span class="conv-k">Qualified</span>
+                            <span class="conv-v">112</span>
+                        </div>
+                        <div class="conv-row hl">
+                            <span class="conv-k">Converted</span>
+                            <span class="conv-v">61</span>
+                        </div>
+                        <div class="conv-row">
+                            <span class="conv-k">New MRR</span>
+                            <span class="conv-v">$1,769</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bars">
+                    <div class="bar-row"><span>Mon</span><div class="bar"><i style="--w:42%"></i></div><b>5</b></div>
+                    <div class="bar-row"><span>Tue</span><div class="bar"><i style="--w:58%"></i></div><b>7</b></div>
+                    <div class="bar-row"><span>Wed</span><div class="bar"><i style="--w:75%"></i></div><b>9</b></div>
+                    <div class="bar-row"><span>Thu</span><div class="bar"><i style="--w:50%"></i></div><b>6</b></div>
+                    <div class="bar-row"><span>Fri</span><div class="bar"><i style="--w:92%"></i></div><b>11</b></div>
+                    <div class="bar-row"><span>Sat</span><div class="bar"><i style="--w:67%"></i></div><b>8</b></div>
+                    <div class="bar-row"><span>Sun</span><div class="bar"><i style="--w:83%"></i></div><b>10</b></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PLUGIN STORE -->
+        <section class="panel glass" id="store">
+            <div class="panel-head">
+                <div>
+                    <h2 class="panel-title">Plugin Store</h2>
+                    <p class="panel-sub">Open-Source Empire Hub — extend Hermes with community plugins</p>
+                </div>
+                <span class="store-tag">◳ Empire Hub</span>
+            </div>
+            <div class="store-grid" id="store-grid"><!-- injected --></div>
+        </section>
+
+        <footer class="dash-foot">
+            <span>© 2026 GG Loop — Hermes V2 Lead Engine</span>
+            <span>Mock data · UI preview build</span>
+        </footer>
+    </main>
+
+    <!-- WebSocket Client -->
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

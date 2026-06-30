@@ -150,6 +150,45 @@ body {
     transform: translateY(-1px);
 }
 
+/* Glowing Dashboard CTA → routes to dashboard.html */
+.nav-dashboard {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600 !important;
+    color: #c7d2fe !important;
+    text-decoration: none;
+    background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(139,92,246,0.12));
+    border: 1px solid rgba(99, 102, 241, 0.45);
+    box-shadow: 0 0 18px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+    transition: all var(--transition) !important;
+    animation: ctaGlow 3s ease-in-out infinite;
+}
+
+.nav-dashboard:hover {
+    color: #fff !important;
+    transform: translateY(-1px);
+    border-color: var(--primary-hover);
+    box-shadow: 0 0 28px rgba(99, 102, 241, 0.5), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+.nav-dashboard-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes ctaGlow {
+    0%, 100% { box-shadow: 0 0 16px rgba(99, 102, 241, 0.22), inset 0 1px 0 rgba(255,255,255,0.08); }
+    50% { box-shadow: 0 0 26px rgba(99, 102, 241, 0.42), inset 0 1px 0 rgba(255,255,255,0.1); }
+}
+
 .nav-mobile-toggle {
     display: none;
     flex-direction: column;
