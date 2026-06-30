@@ -54,16 +54,28 @@ async fn main() -> Result<()> {
 
     tracing::info!("all subsystems initialized successfully, entering main loop");
 
-    let mut signal = tokio::signal::unix::signal(
-        tokio::signal::unix::SignalKind::terminate(),
-    )?;
+    #[cfg(unix)]
+    {
+        let mut signal = tokio::signal::unix::signal(
+            tokio::signal::unix::SignalKind::terminate(),
+        )?;
 
-    tokio::select! {
-        _ = signal.recv() => {
-            tracing::info!("received SIGTERM, initiating graceful shutdown");
+        tokio::select! {
+            _ = signal.recv() => {
+                tracing::info!("received SIGTERM, initiating graceful shutdown");
+            }
+            _ = tokio::signal::ctrl_c() => {
+                tracing::info!("received SIGINT, initiating graceful shutdown");
+            }
         }
-        _ = tokio::signal::ctrl_c() => {
-            tracing::info!("received SIGINT, initiating graceful shutdown");
+    }
+
+    #[cfg(not(unix))]
+    {
+        tokio::select! {
+            _ = tokio::signal::ctrl_c() => {
+                tracing::info!("received SIGINT, initiating graceful shutdown");
+            }
         }
     }
 
