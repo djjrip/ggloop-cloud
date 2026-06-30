@@ -23,7 +23,7 @@
                 <a href="#pricing">Pricing</a>
                 <a href="https://github.com/djjrip/anti-cheat-sdk" target="_blank">GitHub</a>
                 <a href="https://discord.gg/ApVRpc2VJa" target="_blank" class="nav-discord">Discord</a>
-                <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+                <a href="#checkout" class="nav-cta">Pre-Order Now</a>
             </div>
             <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
                 <span></span><span></span><span></span>
@@ -52,8 +52,8 @@
                 <strong>MIT licensed. No vendor lock-in.</strong>
             </p>
             <div class="hero-actions">
-                <a href="#waitlist" class="btn btn-primary btn-lg">
-                    Join the Waitlist
+                <a href="#checkout" class="btn btn-primary btn-lg">
+                    Pre-Order Cloud
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
                 <a href="https://github.com/djjrip/anti-cheat-sdk" target="_blank" class="btn btn-ghost btn-lg">
@@ -207,7 +207,7 @@ guard.<span class="fn">start</span>();</code></pre>
                         <li>Up to 5,000 CCU</li>
                         <li>Email support</li>
                     </ul>
-                    <a href="#waitlist" class="btn btn-primary btn-full">Join the Waitlist</a>
+                    <a href="#checkout" class="btn btn-primary btn-full">Pre-Order Now</a>
                 </div>
                 <div class="pricing-card">
                     <div class="pricing-header">
@@ -227,7 +227,7 @@ guard.<span class="fn">start</span>();</code></pre>
                         <li>Up to 50,000 CCU</li>
                         <li>Priority support</li>
                     </ul>
-                    <a href="#waitlist" class="btn btn-outline btn-full">Join the Waitlist</a>
+                    <a href="#checkout" class="btn btn-outline btn-full">Pre-Order Now</a>
                 </div>
                 <div class="pricing-card pricing-enterprise">
                     <div class="pricing-header">
@@ -251,21 +251,18 @@ guard.<span class="fn">start</span>();</code></pre>
         </div>
     </section>
 
-    <!-- Waitlist -->
-    <section class="waitlist" id="waitlist">
+    <!-- Checkout -->
+    <section class="waitlist" id="checkout">
         <div class="container">
             <div class="waitlist-card">
                 <div class="waitlist-content">
-                    <h2>Ship a cleaner game.</h2>
-                    <p>Join the waitlist for early access to GG Loop Cloud. The SDK is already available on GitHub.</p>
-                    <form class="waitlist-form" id="waitlistForm">
-                        <input type="email" id="waitlistEmail" placeholder="your@studio.com" required autocomplete="email">
-                        <button type="submit" class="btn btn-primary">
-                            Join Waitlist
-                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </button>
-                    </form>
-                    <p class="waitlist-note">No spam. We'll email you when Cloud launches.</p>
+                    <h2>Ship a cleaner game. Automate your growth.</h2>
+                    <p>Get instant access to the GG Loop Anti-Cheat Dashboard and the Empire Hub Automation Suite.</p>
+                    <a href="https://buy.stripe.com/YOUR_STRIPE_LINK_HERE" class="btn btn-primary btn-lg" style="margin-top: 20px; display: inline-flex;">
+                        Pre-Order Now ($29)
+                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style="margin-left: 8px;"><path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </a>
+                    <p class="waitlist-note" style="margin-top: 15px;">Secure checkout powered by Stripe.</p>
                 </div>
             </div>
         </div>
@@ -317,34 +314,16 @@ guard.<span class="fn">start</span>();</code></pre>
             });
         });
 
-        // Waitlist form
-        document.getElementById('waitlistForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('waitlistEmail').value;
-            const btn = e.target.querySelector('button');
-            btn.textContent = 'Joining...';
-            btn.disabled = true;
-
-            // POST to AWS Serverless Backend (API Gateway -> Lambda -> SES)
-            try {
-                await fetch('https://i01oww7co3.execute-api.us-east-1.amazonaws.com/waitlist', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-            } catch (err) {
-                // Silently fail — we'll also store locally
-            }
-
-            btn.innerHTML = '✓ You\'re on the list!';
-            btn.style.background = 'var(--green)';
-            document.getElementById('waitlistEmail').value = '';
-
-            setTimeout(() => {
-                btn.innerHTML = 'Join Waitlist <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-                btn.style.background = '';
-                btn.disabled = false;
-            }, 3000);
+        // Checkout redirect handling (placeholder for when link is added)
+        const checkoutBtns = document.querySelectorAll('a[href="#checkout"]');
+        checkoutBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const target = document.querySelector('#checkout');
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
         });
 
         // Intersection Observer for fade-in animations
