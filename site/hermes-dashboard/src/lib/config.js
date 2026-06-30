@@ -14,8 +14,8 @@ export const EVENTS = {
 
 // Stripe config — replace with real keys from stripe.com/dashboard
 export const STRIPE_CONFIG = {
-  PUBLISHABLE_KEY: '', // pk_live_... or pk_test_...
-  PRICE_ID: '',        // price_... from Stripe product dashboard
+  PUBLISHABLE_KEY: 'pk_live_51TdgGZRqsNN4Xgy6mqbFmDrPddxm581WVUD0mYLQeILdSD52y5sHcUVhYcP0x7lKjWFn6FlK44d2sGqsjFBRxpxC00uGoi2WhX', // pk_live_... or pk_test_...
+  PRICE_ID: 'price_1To4ahRqsNN4Xgy6qAyQ8zrY',        // price_... from Stripe product dashboard
   SUCCESS_URL: window.location.origin + '/success',
   CANCEL_URL: window.location.origin,
 };

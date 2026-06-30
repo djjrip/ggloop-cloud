@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -39,6 +40,24 @@ app.post('/api/leads', (req, res) => {
   io.emit('new_lead', lead);
   
   res.status(200).json({ success: true, message: 'Lead broadcasted successfully' });
+});
+
+// Anti-Cheat Webhook Receiver
+app.post('/api/webhooks/anti-cheat', (req, res) => {
+  const violation = req.body;
+  if (!violation || !violation.player) {
+    return res.status(400).json({ error: 'Invalid violation data' });
+  }
+
+  // Ensure ts exists for frontend sorting
+  violation.ts = violation.ts || Date.now();
+
+  console.log(`🚨 BAN EVENT: [${violation.player}] -> ${violation.reason} (Server: ${violation.server})`);
+  
+  // Instantly broadcast ban to all connected Dashboards via WebSocket
+  io.emit('ban_event', violation);
+  
+  res.status(200).json({ success: true, message: 'Ban broadcasted successfully' });
 });
 
 // Stripe Checkout Endpoint

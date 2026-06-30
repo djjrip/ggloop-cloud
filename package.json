@@ -1,0 +1,13 @@
+{
+  "name": "ggloop-cloud-monorepo",
+  "version": "1.0.0",
+  "description": "GG Loop Cloud - Unified Control Center",
+  "scripts": {
+    "dev:backend": "cd backend && node server.js",
+    "dev:frontend": "cd site/hermes-dashboard && node node_modules/vite/bin/vite.js --host",
+    "dev": "node node_modules/concurrently/dist/bin/concurrently.js -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\""
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
