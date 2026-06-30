@@ -28,3 +28,6 @@ jobs:
       - name: Deploy to S3 (Zero Downtime Sync)
         working-directory: ./site
         run: aws s3 sync . s3://${{ env.S3_BUCKET_NAME }} --delete
+
+      - name: Invalidate CloudFront Cache
+        run: aws cloudfront create-invalidation --distribution-id E2HHP4NGMUAM92 --paths "/*"
