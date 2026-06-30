@@ -325,9 +325,9 @@ guard.<span class="fn">start</span>();</code></pre>
             btn.textContent = 'Joining...';
             btn.disabled = true;
 
-            // POST to backend API (Coming soon in Enterprise upgrade)
+            // POST to AWS Serverless Backend (API Gateway -> Lambda -> SES)
             try {
-                await fetch('https://api.ggloop.io/waitlist', {
+                await fetch('https://i01oww7co3.execute-api.us-east-1.amazonaws.com/waitlist', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })
