@@ -145,6 +145,41 @@ app.post('/api/webhooks/anti-cheat', async (req, res) => {
   }
 });
 
+// Stripe Payment Webhook Receiver
+app.post('/api/webhooks/stripe', async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  let event;
+
+  try {
+    if (stripe && endpointSecret && sig) {
+      event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
+    } else {
+      // Fallback for local development testing without webhook secrets
+      event = req.body;
+    }
+  } catch (err) {
+    console.error('⚠️ Stripe Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle successful subscriptions
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    console.log(`💳 [STRIPE] Subscription payment completed for session: ${session.id}`);
+
+    try {
+      // Generate and persist a real API key/secret pair in the database
+      const pair = await db.generateAndAddKey();
+      console.log(`🔑 [STRIPE] Auto-minted credentials for new subscriber: ${pair.key}`);
+    } catch (err) {
+      console.error('❌ Failed to auto-mint subscriber credentials:', err.message);
+    }
+  }
+
+  res.json({ received: true });
+});
+
 // Stripe Checkout Endpoint
 const stripeKey = process.env.STRIPE_SECRET_KEY;
 const stripe = stripeKey ? require('stripe')(stripeKey) : null;
