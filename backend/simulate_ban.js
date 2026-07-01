@@ -1,38 +1,68 @@
 const http = require('http');
 
-const violation = {
-  player: 'xX_NoScope_Sniper_Xx',
-  server: 'US-East-1',
-  reason: 'CheatEngine.exe Memory Tamper Detected',
-  action: 'BAN',
-  ts: Date.now()
-};
+const players = ['xX_NoScope_Xx', 'TTV_Sweat', 'FaZe_Reject', 'AimBot_Timmy', 'NinjaFan99', 'HackerMan', 'Ghost_Rider', 'SneakyBeaky'];
+const servers = ['US-East-1 (Ohio)', 'EU-West-1 (Frankfurt)', 'AP-South-1 (Mumbai)', 'US-West-1 (Cali)'];
+const reasons = [
+  'CheatEngine.exe Memory Tamper Detected',
+  'ProcessHacker Kernel Modification',
+  'WeMod Injector Detected',
+  'Abnormal mouse tracking (AimBot)',
+  'AutoHotkey Macro Scripting',
+  'DLL Injection in Game.exe'
+];
 
-const data = JSON.stringify(violation);
+function fireWebhook() {
+  const player = players[Math.floor(Math.random() * players.length)];
+  const server = servers[Math.floor(Math.random() * servers.length)];
+  const reason = reasons[Math.floor(Math.random() * reasons.length)];
+  const action = Math.random() > 0.1 ? 'BAN' : 'KICK'; // mostly bans, some kicks
+  const confidence = Math.floor(Math.random() * (100 - 85) + 85); // 85-99%
 
-const options = {
-  hostname: 'localhost',
-  port: 3000,
-  path: '/api/webhooks/anti-cheat',
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Content-Length': data.length
-  }
-};
+  const violation = {
+    player,
+    server,
+    reason,
+    action,
+    confidence, // new field added for table
+    ts: Date.now()
+  };
 
-const req = http.request(options, (res) => {
-  console.log(`STATUS: ${res.statusCode}`);
-  res.on('data', (chunk) => {
-    console.log(`BODY: ${chunk}`);
+  const data = JSON.stringify(violation);
+
+  const options = {
+    hostname: 'localhost',
+    port: 3000,
+    path: '/api/webhooks/anti-cheat',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': data.length
+    }
+  };
+
+  const req = http.request(options, (res) => {
+    // silently process response to avoid log spam
+    res.on('data', () => {});
   });
-});
 
-req.on('error', (e) => {
-  console.error(`problem with request: ${e.message}`);
-});
+  req.on('error', (e) => {
+    console.error(`[Simulator] connection error: ${e.message}`);
+  });
 
-req.write(data);
-req.end();
+  req.write(data);
+  req.end();
+  console.log(`🔫 [Simulator] Sent ${action} for ${player} -> ${reason}`);
+}
 
-console.log('🔫 Fired simulated Anti-Cheat ban webhook...');
+// Fire initially
+fireWebhook();
+// Then fire randomly every 2-6 seconds
+function loop() {
+  const delay = Math.floor(Math.random() * (6000 - 2000) + 2000);
+  setTimeout(() => {
+    fireWebhook();
+    loop();
+  }, delay);
+}
+loop();
+

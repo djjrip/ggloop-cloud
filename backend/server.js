@@ -44,9 +44,25 @@ app.post('/api/leads', (req, res) => {
 
 // Anti-Cheat Webhook Receiver
 app.post('/api/webhooks/anti-cheat', (req, res) => {
-  const violation = req.body;
-  if (!violation || !violation.player) {
+  let violation = req.body;
+  if (!violation) {
     return res.status(400).json({ error: 'Invalid violation data' });
+  }
+
+  // If it's a real SDK event (has sessionId & processName, but no player)
+  if (!violation.player && violation.sessionId) {
+    violation = {
+      player: violation.sessionId,
+      server: violation.windowTitle || 'US-East-1 (SDK Node)',
+      reason: violation.reason || `${violation.processName} Detected`,
+      action: 'BAN',
+      confidence: 99,
+      ts: violation.timestamp ? Date.parse(violation.timestamp) : Date.now()
+    };
+  }
+
+  if (!violation.player) {
+    return res.status(400).json({ error: 'Invalid violation data: missing player or sessionId' });
   }
 
   // Ensure ts exists for frontend sorting

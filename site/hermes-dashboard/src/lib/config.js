@@ -2,10 +2,11 @@
 // HERMES V2 — frontend config
 // The CTO's backend broadcasts real Reddit leads over Socket.IO.
 // ============================================================
-export const HERMES_SOCKET_URL = 'http://localhost:3000';
+export const HERMES_SOCKET_URL = 'http://100.54.149.161:3000';
+export const HERMES_API_URL = 'http://100.54.149.161:3000';
 
 // If the socket can't connect within this window, the UI shows offline.
-export const SOCKET_CONNECT_TIMEOUT_MS = 3500;
+export const SOCKET_CONNECT_TIMEOUT_MS = 10000;
 
 // Event names emitted by the Hermes broker.
 export const EVENTS = {

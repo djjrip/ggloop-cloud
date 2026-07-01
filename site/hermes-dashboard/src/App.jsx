@@ -4,6 +4,7 @@ import AmbientBackground from './components/AmbientBackground';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 import PaywallGate from './components/PaywallGate';
+import Landing from './pages/Landing';
 import Overview from './pages/Overview';
 import AntiCheat from './pages/AntiCheat';
 import Intel from './pages/Intel';
@@ -18,7 +19,7 @@ const pageFade = {
   transition: { duration: 0.3 },
 };
 
-export default function App() {
+function DashboardLayout() {
   const leadsApi = useLeads();
   const location = useLocation();
 
@@ -43,8 +44,7 @@ export default function App() {
                 <Route path="/intel" element={<Intel leadsApi={leadsApi} />} />
                 <Route path="/plugins" element={<Plugins />} />
                 <Route path="/settings" element={<Settings />} />
-                <Route path="/success" element={<Navigate to="/" replace />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </motion.div>
           </AnimatePresence>
@@ -62,5 +62,18 @@ export default function App() {
         </main>
       </div>
     </PaywallGate>
+  );
+}
+
+export default function App() {
+  const location = useLocation();
+  
+  return (
+    <Routes location={location}>
+      <Route path="/" element={<Landing />} />
+      <Route path="/dashboard/*" element={<DashboardLayout />} />
+      <Route path="/success" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }

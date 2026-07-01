@@ -3,11 +3,11 @@ import { motion } from 'framer-motion';
 import { LayoutDashboard, ShieldCheck, Radar, Boxes, Settings as SettingsIcon } from 'lucide-react';
 
 const NAV = [
-  { to: '/', label: 'Overview', Icon: LayoutDashboard, end: true },
-  { to: '/anti-cheat', label: 'Anti-Cheat', Icon: ShieldCheck },
-  { to: '/intel', label: 'Lead Intel', Icon: Radar },
-  { to: '/plugins', label: 'Plugin Store', Icon: Boxes },
-  { to: '/settings', label: 'Settings', Icon: SettingsIcon },
+  { to: '/dashboard', label: 'Overview', Icon: LayoutDashboard, end: true },
+  { to: '/dashboard/anti-cheat', label: 'Anti-Cheat', Icon: ShieldCheck },
+  { to: '/dashboard/intel', label: 'Lead Intel', Icon: Radar },
+  { to: '/dashboard/plugins', label: 'Plugin Store', Icon: Boxes },
+  { to: '/dashboard/settings', label: 'Settings', Icon: SettingsIcon },
 ];
 
 const STATUS = {
