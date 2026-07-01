@@ -14,8 +14,79 @@ if (pgUrl) {
       ssl: { rejectUnauthorized: false } // Required for AWS RDS secure connections
     });
     console.log("🐘 Database: Successfully connected to cloud PostgreSQL pool.");
+    bootstrapPostgres();
   } catch (err) {
     console.error("⚠️ Database: Failed to load pg driver for PostgreSQL. Falling back to local storage.", err.message);
+  }
+}
+
+async function bootstrapPostgres() {
+  if (!pgPool) return;
+  console.log("🐘 Database: Bootstrapping database tables in PostgreSQL...");
+  try {
+    // 1. Create uuid-ossp extension
+    await pgPool.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
+
+    // 2. Create api_keys table
+    await pgPool.query(`
+      CREATE TABLE IF NOT EXISTS api_keys (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        studio_name VARCHAR(100) NOT NULL DEFAULT 'Independent Developer',
+        api_key VARCHAR(100) UNIQUE NOT NULL,
+        api_secret_hash VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pgPool.query('CREATE INDEX IF NOT EXISTS idx_api_keys_lookup ON api_keys(api_key)');
+
+    // 3. Create violations table
+    await pgPool.query(`
+      CREATE TABLE IF NOT EXISTS violations (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        player_id VARCHAR(100) NOT NULL,
+        server_region VARCHAR(50) DEFAULT 'US-East-1',
+        violation_type VARCHAR(20) NOT NULL,
+        process_name VARCHAR(100),
+        window_title VARCHAR(150),
+        confidence_score INTEGER DEFAULT 99,
+        hmac_signature VARCHAR(64) NOT NULL,
+        ts BIGINT NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pgPool.query('CREATE INDEX IF NOT EXISTS idx_violations_player ON violations(player_id)');
+    await pgPool.query('CREATE INDEX IF NOT EXISTS idx_violations_ts ON violations(ts DESC)');
+
+    // 4. Create leads table
+    await pgPool.query(`
+      CREATE TABLE IF NOT EXISTS leads (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        handle VARCHAR(100) NOT NULL,
+        source_platform VARCHAR(50) NOT NULL,
+        origin_url VARCHAR(255),
+        intent_snippet TEXT NOT NULL,
+        lead_tier VARCHAR(20) DEFAULT 'WARM',
+        mrr_estimate INTEGER DEFAULT 0,
+        score INTEGER DEFAULT 50,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pgPool.query('CREATE INDEX IF NOT EXISTS idx_leads_tier ON leads(lead_tier)');
+    await pgPool.query('CREATE INDEX IF NOT EXISTS idx_leads_created ON leads(created_at DESC)');
+
+    // 5. Seed default api key if empty
+    const res = await pgPool.query('SELECT 1 FROM api_keys WHERE api_key = $1', ['GGLOOP_pk_live_djjrip_enterprise_demo']);
+    if (res.rows.length === 0) {
+      await pgPool.query(
+        'INSERT INTO api_keys (studio_name, api_key, api_secret_hash) VALUES ($1, $2, $3)',
+        ['Enterprise Demo Studio', 'GGLOOP_pk_live_djjrip_enterprise_demo', 'GGLOOP_sk_live_djjrip_enterprise_secret_9988']
+      );
+      console.log("🐘 Database: Seeded default API Key into PostgreSQL.");
+    }
+
+    console.log("🐘 Database: PostgreSQL tables successfully initialized.");
+  } catch (err) {
+    console.error("❌ Database: Failed to bootstrap PostgreSQL tables:", err.message);
   }
 }
 
