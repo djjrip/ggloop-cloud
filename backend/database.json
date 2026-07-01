@@ -15,5 +15,33 @@
       "ts": 1782907773499
     }
   ],
-  "leads": []
+  "leads": [
+    {
+      "handle": "Microsoft Xbox (ID@Xbox)",
+      "src": "Outreach_Engine",
+      "url": "xbox-dev-security@microsoft.com",
+      "intent": "Targeting: Director of Xbox Live Developer Ecosystem. Angle: Cross-play security. PC cheaters ruin competitive multiplayer games for Xbox console players. GG Loo...",
+      "tier": "ENTERPRISE",
+      "mrr": 15000,
+      "score": 95
+    },
+    {
+      "handle": "Riot Games (Valorant / League of Legends)",
+      "src": "Outreach_Engine",
+      "url": "security-partnerships@riotgames.com",
+      "intent": "Targeting: VP of Anti-Cheat Engineering. Angle: Private Cloud VPC hosting. Big studios hate sending player telemetry to third-party servers. We allo...",
+      "tier": "ENTERPRISE",
+      "mrr": 15000,
+      "score": 95
+    },
+    {
+      "handle": "Activision Blizzard (Call of Duty / Warzone)",
+      "src": "Outreach_Engine",
+      "url": "ricochet-ops@activision.com",
+      "intent": "Targeting: Head of Anti-Cheat Operations (Ricochet). Angle: Lightweight user-mode process scanning as a secondary defense layer for Call of Duty Warzone client ...",
+      "tier": "ENTERPRISE",
+      "mrr": 15000,
+      "score": 95
+    }
+  ]
 }

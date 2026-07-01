@@ -89,6 +89,75 @@ app.get('/api/history', async (req, res) => {
   }
 });
 
+// REST Endpoint to fetch generated B2B outreach pitches
+app.get('/api/outreach', async (req, res) => {
+  try {
+    const outreach = require('./outreach_engine');
+    const campaigns = await outreach.runCampaigns();
+    res.status(200).json(campaigns);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// REST Endpoint to autonomously send cold emails via Resend API
+app.post('/api/outreach/send', async (req, res) => {
+  const { to, subject, body } = req.body;
+  const apiKey = process.env.RESEND_API_KEY;
+
+  if (!to || !subject || !body) {
+    return res.status(400).json({ error: 'Missing required email fields (to, subject, body)' });
+  }
+
+  if (!apiKey) {
+    return res.status(400).json({ 
+      error: 'Resend API Key is missing in server .env file. Please add RESEND_API_KEY to enable autonomous outreach!' 
+    });
+  }
+
+  const https = require('https');
+  const payload = JSON.stringify({
+    from: 'GG Loop Outreach <onboarding@resend.dev>', // Resend default fallback. Verify ggloop.io on Resend to send as jaysonquindao@ggloop.io
+    to: to,
+    subject: subject,
+    text: body
+  });
+
+  const options = {
+    hostname: 'api.resend.com',
+    port: 443,
+    path: '/emails',
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'Content-Length': payload.length
+    }
+  };
+
+  const emailReq = https.request(options, (emailRes) => {
+    let data = '';
+    emailRes.on('data', (chunk) => { data += chunk; });
+    emailRes.on('end', () => {
+      if (emailRes.statusCode >= 200 && emailRes.statusCode < 300) {
+        console.log(`✉️ [OUTREACH] Cold email successfully dispatched to ${to}`);
+        res.status(200).json({ success: true, message: 'Outreach email successfully sent!' });
+      } else {
+        console.error('❌ Resend API returned error:', data);
+        res.status(emailRes.statusCode).json({ error: `Resend API Error: ${data}` });
+      }
+    });
+  });
+
+  emailReq.on('error', (err) => {
+    console.error('❌ Failed to send email via Resend:', err.message);
+    res.status(500).json({ error: `Network error: ${err.message}` });
+  });
+
+  emailReq.write(payload);
+  emailReq.end();
+});
+
 // Anti-Cheat Webhook Receiver with HMAC Security
 app.post('/api/webhooks/anti-cheat', async (req, res) => {
   const signature = req.headers['x-ggloop-signature'];
@@ -216,4 +285,8 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 GG Loop Lead Broker running on http://localhost:${PORT}`);
   console.log(`   WebSockets ready. Waiting for dashboard connections...`);
+  
+  // Boot and run autonomous B2B campaigns
+  const outreach = require('./outreach_engine');
+  outreach.runCampaigns().catch(err => console.error("❌ Outreach Engine Boot Error:", err.message));
 });
