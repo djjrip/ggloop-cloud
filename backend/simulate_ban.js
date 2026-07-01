@@ -29,6 +29,13 @@ function fireWebhook() {
 
   const data = JSON.stringify(violation);
 
+  // Sign request using the demo API credentials
+  const crypto = require('crypto');
+  const apiKey = 'GGLOOP_pk_live_djjrip_enterprise_demo';
+  const apiSecret = 'GGLOOP_sk_live_djjrip_enterprise_secret_9988';
+  const hmac = crypto.createHmac('sha256', apiSecret);
+  const signature = hmac.update(data).digest('hex');
+
   const options = {
     hostname: 'localhost',
     port: 3000,
@@ -36,7 +43,9 @@ function fireWebhook() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Content-Length': data.length
+      'Content-Length': Buffer.byteLength(data),
+      'X-GGLoop-ApiKey': apiKey,
+      'X-GGLoop-Signature': signature
     }
   };
 

@@ -12,7 +12,6 @@ $GamesBlocklist = @(
     "League of Legends",
     "EldenRing",
     "Cyberpunk2077",
-    "steam",
     "dota2"
 )
 
