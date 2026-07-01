@@ -1,4 +1,4 @@
-# GG Loop Sentinel — Autonomous Gamer/Coder Resource Optimizer
+# GG Loop Sentinel - Autonomous Gamer/Coder Resource Optimizer
 # Runs silently in the background. Auto-suspends dev servers when games are launched, and auto-resumes them on exit.
 
 $GamesBlocklist = @(
@@ -20,8 +20,8 @@ $GamesBlocklist = @(
 $ProjectPath = Split-Path -Path $PSScriptRoot -Parent
 $DevServersRunning = $false
 
-Write-Host "🛡️ GG Loop Sentinel Activated!" -ForegroundColor Green
-Write-Host "📡 Monitoring for game processes..." -ForegroundColor Cyan
+Write-Host "[SENTINEL] GG Loop Sentinel Activated!" -ForegroundColor Green
+Write-Host "[MONITOR] Monitoring for game processes..." -ForegroundColor Cyan
 
 while ($true) {
     # Check if any listed game is currently running
@@ -39,8 +39,8 @@ while ($true) {
         # Check if Node/Vite is running. If so, kill them automatically to free resources.
         $NodeProcesses = Get-Process -Name "node" -ErrorAction SilentlyContinue
         if ($NodeProcesses) {
-            Write-Host "🎮 Game detected: [$ActiveGameName]!" -ForegroundColor Yellow
-            Write-Host "⚡ Auto-suspending dev servers to maximize gaming performance..." -ForegroundColor Red
+            Write-Host "[GAME] Game detected: [$ActiveGameName]!" -ForegroundColor Yellow
+            Write-Host "[ACTION] Auto-suspending dev servers to maximize gaming performance..." -ForegroundColor Red
             
             # Kill Node/Vite processes on Port 3000 and 5173
             $port3000 = Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue
@@ -56,20 +56,22 @@ while ($true) {
             Stop-Process -Name "node" -Force -ErrorAction SilentlyContinue
             
             $DevServersRunning = $false
-            Write-Host "✅ Dev servers suspended. Have a good game!" -ForegroundColor Green
+            Write-Host "[OK] Dev servers suspended. Have a good game!" -ForegroundColor Green
         }
     } else {
         # No game is running. Check if we need to resume the dev environment.
         # If we previously suspended them, start them back up in the background.
         $NodeProcesses = Get-Process -Name "node" -ErrorAction SilentlyContinue
         if (-not $NodeProcesses -and -not $DevServersRunning) {
-            Write-Host "🖥️ Game closed. Auto-resuming developer environment..." -ForegroundColor Cyan
+            Write-Host "[SYSTEM] Game closed. Auto-resuming developer environment..." -ForegroundColor Cyan
             
             # Run start script silently in background CMD window
-            Start-Process cmd.exe -ArgumentList "/c cd /d `"$ProjectPath\ggloop-control`" && start_ggloop.bat" -WindowStyle Hidden
+            # Escape quotes safely for Windows CMD
+            $cmdArg = "/c cd /d `"" + $ProjectPath + "\ggloop-control`" && start_ggloop.bat"
+            Start-Process cmd.exe -ArgumentList $cmdArg -WindowStyle Hidden
             
             $DevServersRunning = $true
-            Write-Host "✅ GG Loop backend and dashboard resumed." -ForegroundColor Green
+            Write-Host "[OK] GG Loop backend and dashboard resumed." -ForegroundColor Green
         }
     }
 
