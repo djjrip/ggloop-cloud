@@ -18,6 +18,8 @@ function StatCard({ Icon, label, value, accent, sub }) {
   );
 }
 
+import { HERMES_API_URL } from '../lib/config';
+
 function timeString(ts) {
   const d = new Date(ts);
   return d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit' }) + '.' + d.getMilliseconds().toString().padStart(3, '0');
@@ -28,18 +30,35 @@ export default function AntiCheat() {
   const bans = events.filter((e) => e.action === 'BAN').length;
   
   const [apiKey, setApiKey] = useState(localStorage.getItem('ggloop_api_key') || null);
+  const [apiSecret, setApiSecret] = useState(localStorage.getItem('ggloop_api_secret') || null);
   const [copied, setCopied] = useState(false);
+  const [copiedSecret, setCopiedSecret] = useState(false);
 
-  const handleGenerateKey = () => {
-    const newKey = 'GGLOOP_pk_live_' + Array.from({length: 32}, () => Math.floor(Math.random()*16).toString(16)).join('');
-    localStorage.setItem('ggloop_api_key', newKey);
-    setApiKey(newKey);
+  const handleGenerateKey = async () => {
+    try {
+      const res = await fetch(`${HERMES_API_URL}/api/keys/generate`, { method: 'POST' });
+      const data = await res.json();
+      if (data.key && data.secret) {
+        localStorage.setItem('ggloop_api_key', data.key);
+        localStorage.setItem('ggloop_api_secret', data.secret);
+        setApiKey(data.key);
+        setApiSecret(data.secret);
+      }
+    } catch (err) {
+      console.error('❌ Failed to generate real API Key:', err);
+    }
   };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(apiKey);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopySecret = () => {
+    navigator.clipboard.writeText(apiSecret);
+    setCopiedSecret(true);
+    setTimeout(() => setCopiedSecret(false), 2000);
   };
 
   return (
@@ -51,14 +70,29 @@ export default function AntiCheat() {
         </div>
         
         {apiKey ? (
-          <div className="flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 p-1.5 pl-3">
-            <span className="font-mono text-xs text-zinc-300 w-[240px] truncate">{apiKey}</span>
-            <button 
-              onClick={handleCopy}
-              className="grid place-items-center h-8 w-8 rounded-lg bg-white/10 text-zinc-300 hover:bg-white/20 transition-colors"
-            >
-              {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-            </button>
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 p-1.5 pl-3">
+              <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-wider">KEY:</span>
+              <span className="font-mono text-xs text-zinc-300 w-[240px] truncate">{apiKey}</span>
+              <button 
+                onClick={handleCopy}
+                className="grid place-items-center h-8 w-8 rounded-lg bg-white/10 text-zinc-300 hover:bg-white/20 transition-colors"
+              >
+                {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+              </button>
+            </div>
+            {apiSecret && (
+              <div className="flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 p-1.5 pl-3">
+                <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-wider">SECRET:</span>
+                <span className="font-mono text-xs text-zinc-300 w-[240px] truncate">{apiSecret}</span>
+                <button 
+                  onClick={handleCopySecret}
+                  className="grid place-items-center h-8 w-8 rounded-lg bg-white/10 text-zinc-300 hover:bg-white/20 transition-colors"
+                >
+                  {copiedSecret ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <button 

@@ -47,6 +47,16 @@ export function useLeads() {
         console.log('🟢 Connected to Hermes Broker', socket.id);
       });
 
+      socket.on('initial_leads', (rawList) => {
+        if (pausedRef.current) return;
+        const normalized = (rawList || []).map(normalizeLead);
+        normalized.sort((a, b) => b.created_at - a.created_at);
+        setLeads(normalized.slice(0, MAX_FEED));
+        setTotalSeen(normalized.length);
+        const highValCount = normalized.filter(l => l.mrr >= 5000).length;
+        setHighValue(highValCount);
+      });
+
       socket.on(EVENTS.NEW_LEAD, (raw) => addLead(normalizeLead(raw)));
 
       socket.on('connect_error', () => {

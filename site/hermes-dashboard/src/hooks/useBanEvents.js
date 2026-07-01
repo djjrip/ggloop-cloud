@@ -27,6 +27,19 @@ export function useBanEvents() {
       socket.on('connect_error', () => setStatus('offline'));
       socket.on('disconnect', () => setStatus('connecting'));
 
+      socket.on('initial_violations', (rawList) => {
+        const mapped = (rawList || []).map(raw => ({
+          id: raw?.id || `ban-${raw.ts || Date.now()}-${Math.random()}`,
+          player: raw?.player || 'unknown',
+          server: raw?.server || '—',
+          reason: raw?.reason || 'Integrity violation',
+          action: (raw?.action || 'ban').toUpperCase(),
+          ts: raw?.ts || Date.now(),
+        }));
+        mapped.sort((a, b) => b.ts - a.ts);
+        setEvents(mapped.slice(0, MAX_LOG));
+      });
+
       socket.on('ban_event', (raw) => {
         const evt = {
           id: raw?.id || `ban-${Date.now()}`,

@@ -4,9 +4,15 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 
+const db = require('./database');
+
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf.toString();
+  }
+}));
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -19,6 +25,11 @@ const io = new Server(server, {
 // Serve as the broker: clients connect here
 io.on('connection', (socket) => {
   console.log(`🔌 Dashboard connected: ${socket.id}`);
+  
+  // Send initial data to dashboard on connection so they don't see empty screens
+  socket.emit('initial_leads', db.getLeads());
+  socket.emit('initial_violations', db.getViolations());
+  
   socket.on('disconnect', () => {
     console.log(`❌ Dashboard disconnected: ${socket.id}`);
   });
@@ -36,17 +47,50 @@ app.post('/api/leads', (req, res) => {
 
   console.log(`🚨 Broadcast: ${lead.tier} [${lead.handle}] -> ${lead.intent}`);
   
+  // Persist to database
+  db.insertLead(lead);
+  
   // Instantly broadcast lead to all connected Dashboards via WebSocket
   io.emit('new_lead', lead);
   
   res.status(200).json({ success: true, message: 'Lead broadcasted successfully' });
 });
 
-// Anti-Cheat Webhook Receiver
+// API Key Generation Endpoint
+app.post('/api/keys/generate', (req, res) => {
+  const pair = db.generateAndAddKey();
+  console.log(`🔑 Generated API Key: ${pair.key}`);
+  res.status(200).json(pair);
+});
+
+// REST Endpoint to fetch historical logs
+app.get('/api/history', (req, res) => {
+  res.status(200).json({
+    leads: db.getLeads(),
+    violations: db.getViolations()
+  });
+});
+
+// Anti-Cheat Webhook Receiver with HMAC Security
 app.post('/api/webhooks/anti-cheat', (req, res) => {
+  const signature = req.headers['x-ggloop-signature'];
+  const apiKey = req.headers['x-ggloop-apikey'];
   let violation = req.body;
+
   if (!violation) {
     return res.status(400).json({ error: 'Invalid violation data' });
+  }
+
+  // Enforce cryptographic security check
+  if (!signature || !apiKey) {
+    console.warn(`⚠️ Blocked unsigned webhook request from IP ${req.ip}`);
+    return res.status(401).json({ error: 'Unauthorized: Missing signature or API key headers' });
+  }
+
+  // Verify signature matches the request payload raw body
+  const isValid = db.verifyApiKeyAndSignature(apiKey, signature, req.rawBody || JSON.stringify(violation));
+  if (!isValid) {
+    return res.status(403).json({ error: 'Forbidden: Cryptographic signature mismatch' });
   }
 
   // If it's a real SDK event (has sessionId & processName, but no player)
@@ -68,12 +112,15 @@ app.post('/api/webhooks/anti-cheat', (req, res) => {
   // Ensure ts exists for frontend sorting
   violation.ts = violation.ts || Date.now();
 
-  console.log(`🚨 BAN EVENT: [${violation.player}] -> ${violation.reason} (Server: ${violation.server})`);
+  console.log(`🚨 SECURE BAN EVENT: [${violation.player}] -> ${violation.reason} (Server: ${violation.server})`);
+  
+  // Persist to database
+  db.insertViolation(violation);
   
   // Instantly broadcast ban to all connected Dashboards via WebSocket
   io.emit('ban_event', violation);
   
-  res.status(200).json({ success: true, message: 'Ban broadcasted successfully' });
+  res.status(200).json({ success: true, message: 'Ban verified and broadcasted successfully' });
 });
 
 // Stripe Checkout Endpoint
