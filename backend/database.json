@@ -1,0 +1,19 @@
+{
+  "apiKeys": [
+    {
+      "key": "GGLOOP_pk_live_djjrip_enterprise_demo",
+      "secret": "GGLOOP_sk_live_djjrip_enterprise_secret_9988"
+    }
+  ],
+  "violations": [
+    {
+      "player": "Dev_Jayson_Local",
+      "server": "US-East-1 (SDK Node)",
+      "reason": "Blocklisted process \"notepad\" detected in running processes.",
+      "action": "BAN",
+      "confidence": 99,
+      "ts": 1782907773499
+    }
+  ],
+  "leads": []
+}
