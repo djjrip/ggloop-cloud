@@ -15,4 +15,9 @@ This document tracks all autonomous development, architecture changes, and agent
 - **Action:** Drafted the B2B Anti-Cheat SaaS Pricing & Tiering Plan (`pricing_model.md`), mapping out Startup ($0), Studio ($1,500), and Enterprise VPC ($15,000) tiers.
 - **Action:** Drafted a 5-slide Enterprise Pitch Deck outline (`pitch_deck_outline.md`) tailored to the VPC Data Sovereignty angle.
 - **Action:** Committed and pushed all new marketing drafts and this changelog to the `ggloop-cloud` GitHub repository.
-- **Note:** All safety boundaries respected (no public posts, no new unauthorized emails, no spending).
+## [2026-07-01 13:28:00] - CTO Strategic Pivot: Mid-Market & Indie Targeting
+- **Status:** CEO initiated strategic correction.
+- **Action:** Killed the old outreach cron job (Task 4691) and scheduled a new one (Task 4792) with updated targeting criteria.
+- **Reasoning:** Riot (Vanguard) and Epic (EAC) already have massive in-house user-mode/AI detection architecture and long enterprise sales cycles. The "Big 6" AAA studios are highly defended. 
+- **Strategic Pivot:** Re-scoped the automated outreach pipeline to target mid-market and indie multiplayer studios. These studios lack in-house R&D and are stuck paying for expensive, invasive third-party kernel solutions, offering a much shorter sales cycle and higher immediate conversion potential for GG Loop's user-mode SDK.
+- **Note:** The Big 6 have not been removed from the long-term pipeline, just deprioritized for immediate outreach. No unapproved emails were sent during this update.
