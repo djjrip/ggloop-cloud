@@ -10,6 +10,7 @@ import AntiCheat from './pages/AntiCheat';
 import Intel from './pages/Intel';
 import Plugins from './pages/Plugins';
 import Settings from './pages/Settings';
+import Orchestrator from './pages/Orchestrator';
 import { useLeads } from './hooks/useLeads';
 
 const pageFade = {
@@ -42,6 +43,7 @@ function DashboardLayout() {
                 <Route path="/" element={<Overview leadsApi={leadsApi} />} />
                 <Route path="/anti-cheat" element={<AntiCheat leadsApi={leadsApi} />} />
                 <Route path="/intel" element={<Intel leadsApi={leadsApi} />} />
+                <Route path="/orchestrator" element={<Orchestrator />} />
                 <Route path="/plugins" element={<Plugins />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, ShieldCheck, Radar, Boxes, Settings as SettingsIcon } from 'lucide-react';
+import { LayoutDashboard, ShieldCheck, Radar, Boxes, Settings as SettingsIcon, GitBranch } from 'lucide-react';
 
 const NAV = [
   { to: '/dashboard', label: 'Overview', Icon: LayoutDashboard, end: true },
   { to: '/dashboard/anti-cheat', label: 'Anti-Cheat', Icon: ShieldCheck },
   { to: '/dashboard/intel', label: 'Lead Intel', Icon: Radar },
+  { to: '/dashboard/orchestrator', label: 'AI Orchestrator', Icon: GitBranch },
   { to: '/dashboard/plugins', label: 'Plugin Store', Icon: Boxes },
   { to: '/dashboard/settings', label: 'Settings', Icon: SettingsIcon },
 ];

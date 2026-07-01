@@ -1,0 +1,222 @@
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { User, Paintbrush, Cpu, Copy, Check, CheckSquare, Square } from 'lucide-react';
+
+const CLAUDE_PROMPTS = {
+  slides: `Act as a Lead Designer. I need a 6-slide executive pitch deck using the GG Loop Design System. 
+Target: VPs of Engineering and CTOs at gaming companies (like Activision, Riot).
+
+Slide Outline:
+1. Title: GG Loop - Enterprise Anti-Cheat Telemetry
+2. The Problem: The high cost of hacking and building in-house security ($200k+ salaries, 6 months build time).
+3. The Solution: Our 0-dependency native SDK & private cloud gateway.
+4. Product Showcase: Real-time memory scanning, active window focus tracking, and dashboard.
+5. The Enterprise Offer: Self-hosted VPC gateway deployment (security & compliance compliant).
+6. CTA: Schedule a 10-minute technical brief.
+
+Use a high-end dark-mode theme, glassmorphic card borders, and bright neon green (#10b981) accents for visual highlights.`,
+
+  dashboard: `Act as a Lead UI/UX Designer. I need an interactive prototype of the "GG Loop Enterprise Admin Console" using our attached design system.
+
+Key Sections to include:
+1. Multi-Game Overview: Dropdown to switch between "Game A" and "Game B".
+2. Real-time Status Card: Displays active player count, security sentinel status (Online/Active), and ban counts.
+3. Violation Spreadsheet: A high-density grid showing: Player ID, Flagged Process, Detected Hack Type, Confidence Score (%), Action Taken (Ban/Kick), and Timestamp.
+4. Security Settings Panel: Toggle controls for: Kernel Scanning, Focus Tracking, Hook Detection, and Webhook Signing.
+
+Use a dark-mode theme with high-density data layouts, glassmorphism card panels, and smooth transition states.`,
+
+  sandbox: `Design a beautiful, single-page HTML/CSS interactive sandbox demo component for our marketing page.
+- It should show a simulated game client container on the left, and a mini-telemetry log on the right.
+- Include a button that says "Simulate Cheat Injection".
+- When clicked, show a terminal-style alert: "🚨 [WARNING] Memory tamper detected in game process!" and watch the log update on the right in real-time.
+- Use vanilla CSS, dark glassmorphism effects, and neon green accents.`
+};
+
+export default function Orchestrator() {
+  const [copiedKey, setCopiedKey] = useState(null);
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem('ggloop_tasks');
+    if (saved) return JSON.parse(saved);
+    return {
+      jayson: [
+        { id: 'j1', text: 'Check Discord Webhook alerts for new lead signals', done: false },
+        { id: 'j2', text: 'Reach out to the latest Enterprise Lead (Riot/Bungie) using generated B2B pitch', done: false },
+        { id: 'j3', text: 'Record a quick 2-minute Loom demo of the live dashboard to attach to emails', done: false },
+        { id: 'j4', text: 'Post a LinkedIn update: "How we automated anti-cheat signal discovery at GG Loop"', done: false }
+      ],
+      claude: [
+        { id: 'c1', text: 'Generate B2B Enterprise Pitch Slide Deck in Claude Design', done: false, promptKey: 'slides' },
+        { id: 'c2', text: 'Generate Enterprise Admin Console wireframe / mockup', done: false, promptKey: 'dashboard' },
+        { id: 'c3', text: 'Design an interactive HTML/CSS demo sandbox component for our website', done: false, promptKey: 'sandbox' }
+      ],
+      antigravity: [
+        { id: 'a1', text: 'Implement HMAC webhook validation in server.js to prevent spoofed bans', done: false },
+        { id: 'a2', text: 'Create SQLite database integration in backend to persist leads and bans', done: false },
+        { id: 'a3', text: 'Build Unreal Engine C++ header SDK wrappers and write documentation', done: false },
+        { id: 'a4', text: 'Keep the local Windows system optimized and monitor resources (Sentinel)', done: true }
+      ]
+    };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ggloop_tasks', JSON.stringify(tasks));
+  }, [tasks]);
+
+  const toggleTask = (column, id) => {
+    setTasks(prev => ({
+      ...prev,
+      [column]: prev[column].map(t => t.id === id ? { ...t, done: !t.done } : t)
+    }));
+  };
+
+  const copyPrompt = (key) => {
+    navigator.clipboard.writeText(CLAUDE_PROMPTS[key]);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  return (
+    <div className="flex flex-1 flex-col gap-6">
+      <div>
+        <h1 className="text-2xl font-black tracking-tight text-white md:text-3xl">AI Orchestration Hub</h1>
+        <p className="mt-1 text-sm text-zinc-400">
+          Daily business operations, design prompting, and active engineering backlog.
+        </p>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Column 1: Jayson (CEO) */}
+        <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+          <div className="flex items-center gap-3 border-b border-white/5 pb-3">
+            <div className="grid h-9 w-9 place-items-center rounded-xl border border-brand/20 bg-brand/10 text-brand">
+              <User size={18} />
+            </div>
+            <div>
+              <h2 className="font-bold text-white text-[15px]">Jayson (CEO & Growth)</h2>
+              <p className="text-[11px] text-zinc-500">Manual growth & client outreach tasks</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {tasks.jayson.map(task => (
+              <div
+                key={task.id}
+                onClick={() => toggleTask('jayson', task.id)}
+                className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-all ${
+                  task.done
+                    ? 'border-white/5 bg-white/[0.01] text-zinc-500'
+                    : 'border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/20'
+                }`}
+              >
+                <div className="mt-0.5 flex-shrink-0">
+                  {task.done ? (
+                    <CheckSquare size={16} className="text-brand" />
+                  ) : (
+                    <Square size={16} className="text-zinc-500" />
+                  )}
+                </div>
+                <span className="text-[12.5px] font-medium leading-relaxed">{task.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Column 2: Claude (Creative & UI) */}
+        <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+          <div className="flex items-center gap-3 border-b border-white/5 pb-3">
+            <div className="grid h-9 w-9 place-items-center rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-400">
+              <Paintbrush size={18} />
+            </div>
+            <div>
+              <h2 className="font-bold text-white text-[15px]">Claude (Creative & UI)</h2>
+              <p className="text-[11px] text-zinc-500">Design assets & slide pitches</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {tasks.claude.map(task => (
+              <div
+                key={task.id}
+                className={`flex flex-col gap-3 rounded-xl border p-3.5 transition-all ${
+                  task.done
+                    ? 'border-white/5 bg-white/[0.01] text-zinc-500'
+                    : 'border-white/10 bg-white/[0.03] text-zinc-300'
+                }`}
+              >
+                <div 
+                  className="flex cursor-pointer items-start gap-3"
+                  onClick={() => toggleTask('claude', task.id)}
+                >
+                  <div className="mt-0.5 flex-shrink-0">
+                    {task.done ? (
+                      <CheckSquare size={16} className="text-amber-500" />
+                    ) : (
+                      <Square size={16} className="text-zinc-500" />
+                    )}
+                  </div>
+                  <span className="text-[12.5px] font-medium leading-relaxed">{task.text}</span>
+                </div>
+                
+                {task.promptKey && (
+                  <button
+                    onClick={() => copyPrompt(task.promptKey)}
+                    className="mt-1 flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/5 py-1.5 text-xs font-bold text-white transition-colors hover:bg-white/10"
+                  >
+                    {copiedKey === task.promptKey ? (
+                      <>
+                        <Check size={13} className="text-emerald-400" />
+                        Prompt Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={13} />
+                        Copy Claude Prompt
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Column 3: Antigravity (Dev & Deploy) */}
+        <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+          <div className="flex items-center gap-3 border-b border-white/5 pb-3">
+            <div className="grid h-9 w-9 place-items-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
+              <Cpu size={18} />
+            </div>
+            <div>
+              <h2 className="font-bold text-white text-[15px]">Antigravity (Dev & Deploy)</h2>
+              <p className="text-[11px] text-zinc-500">Core code logic & active servers</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {tasks.antigravity.map(task => (
+              <div
+                key={task.id}
+                onClick={() => toggleTask('antigravity', task.id)}
+                className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-all ${
+                  task.done
+                    ? 'border-white/5 bg-white/[0.01] text-zinc-500'
+                    : 'border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/20'
+                }`}
+              >
+                <div className="mt-0.5 flex-shrink-0">
+                  {task.done ? (
+                    <CheckSquare size={16} className="text-emerald-500" />
+                  ) : (
+                    <Square size={16} className="text-zinc-500" />
+                  )}
+                </div>
+                <span className="text-[12.5px] font-medium leading-relaxed">{task.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
