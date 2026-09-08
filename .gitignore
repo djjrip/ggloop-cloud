@@ -36,3 +36,9 @@ Thumbs.db
 # Java build artifacts
 compliance/build/
 *.class
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
